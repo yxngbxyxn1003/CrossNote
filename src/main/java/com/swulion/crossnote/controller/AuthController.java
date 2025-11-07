@@ -1,6 +1,7 @@
 package com.swulion.crossnote.controller;
 
 import com.swulion.crossnote.jwt.JwtBlacklistService;
+import com.swulion.crossnote.service.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +19,11 @@ import com.swulion.crossnote.entity.User;
 import io.jsonwebtoken.ExpiredJwtException;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.swulion.crossnote.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /*
@@ -92,19 +96,23 @@ public class AuthController {
      [GET] /auth/me
      */
     @GetMapping("/me")
-    public ResponseEntity<String> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getMyInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        if (userDetails == null) {
+        if (customUserDetails == null) {
             // 이 로그가 찍히면 필터가 제대로 동작 안 한 것
             log.warn("인증된 사용자 정보를 찾을 수 없습니다.");
             return ResponseEntity.status(401).body("인증 정보가 없습니다.");
         }
 
-        // userDetails.getUsername()은 JwtAuthenticationFilter에서 넣은 user.getEmail() 값
-        String userEmail = userDetails.getUsername();
-        log.info("인증된 사용자 이메일: {}", userEmail);
+        // DB 추가 조회 없이 객체에서 바로 꺼냄
+        String userEmail = customUserDetails.getUsername(); // (CustomUserDetails.getEmail() 호출)
+        String userName = customUserDetails.getUser().getName(); // (CustomUserDetails.getUser() 호출)
+        log.info("인증된 사용자 정보 조회: (이메일: {}, 이름: {})", userEmail, userName);
 
-        // Postman에서 이 이메일이 보이면 성공
-        return ResponseEntity.ok("당신의 이메일은 " + userEmail + " 입니다.");
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("email", userEmail);
+        responseBody.put("name", userName);
+
+        return ResponseEntity.ok(responseBody);
     }
 }
