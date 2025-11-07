@@ -7,10 +7,13 @@ import com.swulion.crossnote.entity.LoginType;
 import com.swulion.crossnote.entity.User;
 import com.swulion.crossnote.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.swulion.crossnote.jwt.JwtTokenProvider;
+
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -22,6 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, Object> redisTemplate; // Redis 주입
 
     /* 로컬 회원가입 로직 */
     @Transactional
@@ -56,7 +60,7 @@ public class UserService {
     }
 
     /* 로컬 로그인 로직 */
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponseDto login(LocalLoginRequestDto requestDto) {
 
 
@@ -75,10 +79,21 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 비밀번호 일치 -> JWT Access Token 생성
+        /* 토큰 생성 및 Redis 저장 */
+        /* 비밀번호 일치 -> */
+        // Access Token 생성 (Email, UserId)
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getUserId());
+        // Refresh Token 생성 (Email)
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        // Access Token을 DTO에 담아 반환
-        return new LoginResponseDto(accessToken);
+        // Redis에 refresh Token 저장 (Key: email, Value: refreshToken)
+        redisTemplate.opsForValue().set(
+                "RT:" + user.getEmail(), refreshToken, // Key, Value
+                jwtTokenProvider.getRefreshTokenExpirationTime(), // 만료 시간
+                TimeUnit.MILLISECONDS //ms 단위
+        );
+
+        // Access Token과 Refresh Token을 DTO에 담아 반환
+        return new LoginResponseDto(accessToken, refreshToken);
     }
 }
