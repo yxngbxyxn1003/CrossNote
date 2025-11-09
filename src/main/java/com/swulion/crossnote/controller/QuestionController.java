@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/Question")
+@RequestMapping("/question")
 public class QuestionController {
 
     private final QuestionService questionService;

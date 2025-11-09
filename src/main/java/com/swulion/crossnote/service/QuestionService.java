@@ -26,6 +26,7 @@ public class QuestionService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final AnswerRepository answerRepository;
+    private final QuestionCategoryRepository questionCategoryRepository;
 
     /* 질문 생성 로직 */
     public QuestionResponseDto createQuestion(QuestionRequestDto questionRequestDto) {
@@ -49,18 +50,21 @@ public class QuestionService {
         questionCategory1.setQuestionCategoryId(questionCategoryId1);
         questionCategory1.setQuestionId(question);
         questionCategory1.setCreatedAt(LocalDateTime.now());
+        questionCategoryRepository.save(questionCategory1);
 
         if (questionCategoryId2 != null) {
             QuestionCategory questionCategory2 = new QuestionCategory();
             questionCategory2.setQuestionCategoryId(questionCategoryId2);
             questionCategory2.setQuestionId(question);
             questionCategory2.setCreatedAt(LocalDateTime.now());
+            questionCategoryRepository.save(questionCategory2);
         }
         if (questionCategoryId3 != null) {
             QuestionCategory questionCategory3 = new QuestionCategory();
             questionCategory3.setQuestionCategoryId(questionCategoryId3);
             questionCategory3.setQuestionId(question);
             questionCategory3.setCreatedAt(LocalDateTime.now());
+            questionCategoryRepository.save(questionCategory3);
         }
 
         return new QuestionResponseDto(questionerId.getUserId(), question.getTitle(), question.getContent(),
