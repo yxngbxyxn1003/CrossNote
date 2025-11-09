@@ -40,10 +40,17 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer curationLevel;
 
+    @Column(nullable = false)
+    private long followersCount = 0L;
+
+    @Column(nullable = false)
+    private long followingsCount = 0L;
+
     /* Builder */
     @Builder
     public User(String email, String password, String name, LocalDateTime birthDate,
-                String profileImageUrl, LoginType loginType, Integer curationLevel) {
+                String profileImageUrl, LoginType loginType, Integer curationLevel,
+                Long followersCount, Long followingsCount) {
         this.email = email;
         this.password = password;
         this.name = name;
@@ -52,6 +59,8 @@ public class User extends BaseTimeEntity {
         this.loginType = loginType;
         // UserService에서 curationLevel을 1로 설정했으므로, 빌더에서도 기본값 처리
         this.curationLevel = (curationLevel != null) ? curationLevel : 1;
+        this.followersCount = (followersCount != null) ? followersCount : 0L;
+        this.followingsCount = (followingsCount != null) ? followingsCount : 0L;
     }
 
     /* 소셜 로그인 시, 기존 유저의 정보가 변경되었을 때 업데이트 */
@@ -59,5 +68,25 @@ public class User extends BaseTimeEntity {
         this.name = name;
         this.profileImageUrl = profileImageUrl;
         return this;
+    }
+
+    public void increaseFollowersCount() {
+        this.followersCount++;
+    }
+
+    public void decreaseFollowersCount() {
+        if (this.followersCount > 0) {
+            this.followersCount--;
+        }
+    }
+
+    public void increaseFollowingsCount() {
+        this.followingsCount++;
+    }
+
+    public void decreaseFollowingsCount() {
+        if (this.followingsCount > 0) {
+            this.followingsCount--;
+        }
     }
 }
