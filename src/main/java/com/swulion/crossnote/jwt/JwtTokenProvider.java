@@ -19,27 +19,48 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final SecretKey key;
-    private final long expirationTime;
+    private final long accessTokenExpirationTime; // Access Token 만료 시간
+    private final long refreshTokenExpirationTime; // Refresh Token 만료 시간
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey,
-                            @Value("${jwt.expiration-time}") long expirationTime) {
+                            @Value("${jwt.access-token-expiration-time}") long accessTokenExpirationTime,
+                            @Value("${jwt.refresh-token-expiration-time}") long refreshTokenExpirationTime) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.expirationTime = expirationTime;
+        this.accessTokenExpirationTime = accessTokenExpirationTime;
+        this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
     /* [JWT Access Token 생성] */
     public String generateAccessToken(String email, Long userId) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expirationTime);
+        Date expiryDate = new Date(now.getTime() + accessTokenExpirationTime);
 
         return Jwts.builder()
-                .subject(email)
+                .setSubject(email)
                 .claim("userId", userId)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
                 .compact();
+    }
+
+    /* [JWT Refresh Token 생성] */
+    public String generateRefreshToken(String email) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshTokenExpirationTime);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(key)
+                .compact();
+    }
+
+    /* Refresh Token의 만료 시간 반환 (Redis TTL 설정을 위하여) */
+    public long getRefreshTokenExpirationTime() {
+        return this.refreshTokenExpirationTime;
     }
 
     /* [JWT 토큰 유효성 검증] */
