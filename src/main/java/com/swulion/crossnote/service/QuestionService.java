@@ -73,7 +73,7 @@ public class QuestionService {
         List<Question> questions = questionRepository.findAll();
         List<QuestionListDto> questionListDtos = new ArrayList<>();
         for (Question question : questions) {
-            List<Answer> answers = answerRepository.findByQuestion(question);
+            List<Answer> answers = answerRepository.findByQuestionId(question);
             questionListDtos.add(
                     new QuestionListDto(
                             question.getQuestionId(),

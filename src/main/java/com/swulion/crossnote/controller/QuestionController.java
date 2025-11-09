@@ -20,7 +20,7 @@ public class QuestionController {
     private final QuestionService questionService;
 
     /* 질문 생성 */
-    @PostMapping("/{questionId}")
+    @PostMapping("/create")
     public ResponseEntity<QuestionResponseDto> createQuestion(@RequestBody QuestionRequestDto questionRequestDto) {
         QuestionResponseDto questionResponseDto = questionService.createQuestion(questionRequestDto);
         return ResponseEntity.ok(questionResponseDto);
