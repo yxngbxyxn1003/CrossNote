@@ -3,10 +3,7 @@ package com.swulion.crossnote.service;
 import com.swulion.crossnote.dto.QuestionListDto;
 import com.swulion.crossnote.dto.QuestionRequestDto;
 import com.swulion.crossnote.dto.QuestionResponseDto;
-import com.swulion.crossnote.entity.Answer;
-import com.swulion.crossnote.entity.Question;
-import com.swulion.crossnote.entity.QuestionCategory;
-import com.swulion.crossnote.entity.User;
+import com.swulion.crossnote.entity.*;
 import com.swulion.crossnote.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,42 +30,48 @@ public class QuestionService {
         Question question = new Question();
         question.setCreatedAt(LocalDateTime.now());
         question.setUpdatedAt(LocalDateTime.now());
-        question.setTitle(questionRequestDto.title());
-        question.setContent(questionRequestDto.content());
+        question.setTitle(questionRequestDto.getTitle());
+        question.setContent(questionRequestDto.getContent());
         question.setLikeCount(0);
 
-        User questionerId = userRepository.findById(questionRequestDto.userId())
+        User questionerId = userRepository.findById(questionRequestDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User Not Found"));
         question.setQuestionerId(questionerId);
         questionRepository.save(question);
 
-        Long questionCategoryId1 = categoryRepository.findByCategoryName(questionRequestDto.questionCategoryId1());
-        Long questionCategoryId2 = categoryRepository.findByCategoryName(questionRequestDto.questionCategoryId2());
-        Long questionCategoryId3 = categoryRepository.findByCategoryName(questionRequestDto.questionCategoryId3());
+        Category category1 = categoryRepository.findByCategoryId(questionRequestDto.getCategory1());
+        Category category2 = categoryRepository.findByCategoryId(questionRequestDto.getCategory2());
+        Category category3 = categoryRepository.findByCategoryId(questionRequestDto.getCategory3());
 
         QuestionCategory questionCategory1 = new QuestionCategory();
-        questionCategory1.setQuestionCategoryId(questionCategoryId1);
+        questionCategory1.setCategoryId(category1);
         questionCategory1.setQuestionId(question);
         questionCategory1.setCreatedAt(LocalDateTime.now());
         questionCategoryRepository.save(questionCategory1);
 
-        if (questionCategoryId2 != null) {
-            QuestionCategory questionCategory2 = new QuestionCategory();
-            questionCategory2.setQuestionCategoryId(questionCategoryId2);
+
+        QuestionCategory questionCategory2 =  null;
+        QuestionCategory questionCategory3 = null;
+        if (category2 != null) {
+            questionCategory2 = new QuestionCategory();
+            questionCategory2.setCategoryId(category2);
             questionCategory2.setQuestionId(question);
             questionCategory2.setCreatedAt(LocalDateTime.now());
             questionCategoryRepository.save(questionCategory2);
         }
-        if (questionCategoryId3 != null) {
-            QuestionCategory questionCategory3 = new QuestionCategory();
-            questionCategory3.setQuestionCategoryId(questionCategoryId3);
+        if (category3 != null) {
+            questionCategory3 = new QuestionCategory();
+            questionCategory3.setCategoryId(category3);
             questionCategory3.setQuestionId(question);
             questionCategory3.setCreatedAt(LocalDateTime.now());
             questionCategoryRepository.save(questionCategory3);
         }
 
+        Long responseCatId2 = (category2 != null) ? category2.getCategoryId() : null;
+        Long responseCatId3 = (category3 != null) ? category3.getCategoryId() : null;
+
         return new QuestionResponseDto(questionerId.getUserId(), question.getTitle(), question.getContent(),
-                0, question.getCreatedAt(), question.getUpdatedAt(), questionCategoryId1, questionCategoryId2, questionCategoryId3);
+                0, question.getCreatedAt(), question.getUpdatedAt(), category1.getCategoryId(), responseCatId2, responseCatId3);
 
     }
 

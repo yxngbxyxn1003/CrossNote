@@ -17,13 +17,13 @@ public class QuestionCategory {
     @GeneratedValue
     private Long questionCategoryId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "questionId")
     private Question questionId;
 
-//    @OneToOne
-//    @JoinColumn(name = "categoryId")
-//    private Category categoryId;
+    @ManyToOne
+    @JoinColumn(name = "categoryId")
+    private Category categoryId;
 
     private LocalDateTime createdAt;
 }
