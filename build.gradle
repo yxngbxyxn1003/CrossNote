@@ -49,8 +49,20 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mysql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// DB 드라이버 (MySQL)
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// 인메모리 H2 데이터베이스
+	implementation 'com.h2database:h2'
+
+	// Netty 클래스 누락 해결을 위해 명시적으로 추가
+	implementation 'io.netty:netty-handler'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+
