@@ -12,7 +12,7 @@ public class OnboardingDetailResponseDto {
     private Long userId;
 
     private String email;
-    private List<Long> interestIds;
-    private List<Long> expertiseIds;
+    private List<String> interestNames;
+    private List<String> expertiseNames;
     private CurationLevel curationLevel;
 }

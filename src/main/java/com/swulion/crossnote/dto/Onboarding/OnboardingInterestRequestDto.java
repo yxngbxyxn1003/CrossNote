@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 public class OnboardingInterestRequestDto {
     @NotNull(message = "관심분야는 필수입니다.")
-    private List<Long> interestIds;
+    private List<String> interestNames;
 }

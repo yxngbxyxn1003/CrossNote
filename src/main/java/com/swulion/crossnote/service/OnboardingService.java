@@ -30,16 +30,16 @@ public class OnboardingService {
     }
 
     // 관심분야 업데이트
-    public OnboardingResponseDto updateUserInterests(String email, List<Long> interestIds) {
+    public OnboardingResponseDto updateUserInterests(String email, List<String> interestNames) {
         User user = findUserByEmail(email);
-        savePreferences(user, interestIds, PreferenceType.INTEREST);
+        savePreferences(user, interestNames, PreferenceType.INTEREST);
         return new OnboardingResponseDto(user.getUserId());
     }
 
     // 전문분야 업데이트
-    public OnboardingResponseDto updateUserExpertise(String email, List<Long> expertiseIds) {
+    public OnboardingResponseDto updateUserExpertise(String email, List<String> expertiseNames) {
         User user = findUserByEmail(email);
-        savePreferences(user, expertiseIds, PreferenceType.EXPERTISE);
+        savePreferences(user, expertiseNames, PreferenceType.EXPERTISE);
         return new OnboardingResponseDto(user.getUserId());
     }
 
@@ -54,25 +54,21 @@ public class OnboardingService {
      관심분야/전문분야 저장
      기존 동일 타입 엔티티 제거 후 새로 매핑
      */
-    private void savePreferences(User user, List<Long> categoryIds, PreferenceType type) {
-        // 기존 동일 타입 제거
-        // removeIf를 사용하면 내부 Set을 안전하게 순회하면서 삭제 가능
+    private void savePreferences(User user, List<String> categoryNames, PreferenceType type) {
+        // 삭제
         user.getPreferences().removeIf(p -> p.getPreferenceType() == type);
+        userRepository.save(user); // 삭제 내역 반영
+        userRepository.flush();    // 강제 반영 (필요시 clear도 고려)
 
-        // 새 관심/전문 매핑
-        for (Long categoryId : categoryIds) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID: " + categoryId));
-
-            // 전문분야인 경우 상위 카테고리 선택 방지
-            if (type == PreferenceType.EXPERTISE && category.getParentCategoryId() == null) {
+        // 추가
+        for (String name : categoryNames) {
+            Category category = categoryRepository.findByCategoryName(name);
+            if (category == null) throw new IllegalArgumentException("존재하지 않는 카테고리 이름: " + name);
+            if (type == PreferenceType.EXPERTISE && category.getParentCategoryId() == null)
                 throw new IllegalArgumentException("상위 카테고리는 전문분야로 선택할 수 없습니다.");
-            }
-
             UserCategoryPreference preference = UserCategoryPreference.create(user, category, type);
             user.getPreferences().add(preference);
         }
-
         userRepository.save(user);
     }
 
@@ -81,22 +77,22 @@ public class OnboardingService {
     public OnboardingDetailResponseDto getUserOnboardingInfo(Long userId) {
         User user = findUserById(userId);
 
-        List<Long> interestIds = new ArrayList<>();
-        List<Long> expertiseIds = new ArrayList<>();
+        List<String> interestNames = new ArrayList<>();
+        List<String> expertiseNames = new ArrayList<>();
 
         for (UserCategoryPreference pref : user.getPreferences()) {
             if (pref.getPreferenceType() == PreferenceType.INTEREST) {
-                interestIds.add(pref.getCategory().getCategoryId());
+                interestNames.add(pref.getCategory().getCategoryName());
             } else if (pref.getPreferenceType() == PreferenceType.EXPERTISE) {
-                expertiseIds.add(pref.getCategory().getCategoryId());
+                expertiseNames.add(pref.getCategory().getCategoryName());
             }
         }
 
         return new OnboardingDetailResponseDto(
                 user.getUserId(),
                 user.getEmail(),
-                interestIds,
-                expertiseIds,
+                interestNames,
+                expertiseNames,
                 user.getCurationLevel()
         );
     }

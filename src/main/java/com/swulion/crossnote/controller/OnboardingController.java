@@ -39,7 +39,7 @@ public class OnboardingController {
             @Valid @RequestBody OnboardingInterestRequestDto dto) {
 
         String email = userDetails.getUser().getEmail();
-        return ResponseEntity.ok(onboardingService.updateUserInterests(email, dto.getInterestIds()));
+        return ResponseEntity.ok(onboardingService.updateUserInterests(email, dto.getInterestNames()));
     }
 
     /*
@@ -52,7 +52,7 @@ public class OnboardingController {
             @Valid @RequestBody OnboardingExpertiseRequestDto dto) {
 
         String email = userDetails.getUser().getEmail();
-        return ResponseEntity.ok(onboardingService.updateUserExpertise(email, dto.getExpertiseIds()));
+        return ResponseEntity.ok(onboardingService.updateUserExpertise(email, dto.getExpertiseNames()));
     }
 
     /*
