@@ -50,7 +50,6 @@ public class UserService {
                 .password(encodedPassword) // 암호화된 비밀번호 저장
                 .name(requestDto.getName())
                 .loginType(LoginType.LOCAL) // 로컬 타입
-                .curationLevel(1) // 기본값 1로 설정
                 .build();
 
         // DB에 저장
