@@ -26,7 +26,6 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity // Spring Security 설정 활성화
 @RequiredArgsConstructor
-@Profile("local")
 public class SecurityConfig {
 
     // JWT 인증 필터
