@@ -23,7 +23,7 @@ public class ColumnEntity {
     @JoinColumn(name = "userId")
     private User columnAutherId;
 
-    @Column(length = 100)
+    @Column(length = 20)
     private String title;
 
     private String content;
