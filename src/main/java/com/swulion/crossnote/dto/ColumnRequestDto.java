@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ColumnRequestDto {
-    private Long userId;
+    //private Long userId;
     private String title;
     private String content;
     @Column(nullable = false)

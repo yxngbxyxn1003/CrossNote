@@ -48,7 +48,11 @@ public class ColumnService {
 //    }
 
     /* 칼럼 생성 */
-    public ColumnDetailResponseDto createColumn(ColumnRequestDto columnRequestDto) {
+    public ColumnDetailResponseDto createColumn(ColumnRequestDto columnRequestDto, Long loginUserId) {
+
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
         ColumnEntity columnEntity = new ColumnEntity();
         columnEntity.setCreatedAt(LocalDateTime.now());
         columnEntity.setUpdatedAt(LocalDateTime.now());
@@ -57,7 +61,7 @@ public class ColumnService {
         columnEntity.setContent(columnRequestDto.getContent());
         columnEntity.setImageUrl(columnRequestDto.getImageUrl());
 
-        User columnAuthorId = userRepository.findById(columnRequestDto.getUserId())
+        User columnAuthorId = userRepository.findById(user.getUserId())
                 .orElseThrow(() -> new RuntimeException("User Not Found"));
         columnEntity.setColumnAutherId(columnAuthorId);
         columnRepository.save(columnEntity);
@@ -69,7 +73,7 @@ public class ColumnService {
                 columnEntity.getTitle(),
                 columnEntity.getContent(),
                 columnEntity.getLikeCount(),
-                columnEntity.getCommentCount(),
+                0,
                 columnEntity.isBestColumn(),
                 columnEntity.getImageUrl(),
                 columnEntity.getCreatedAt(),
@@ -90,6 +94,8 @@ public class ColumnService {
         if (columnEntity == null){
             throw new EntityNotFoundException("Column Not Found");
         }else {
+
+            columnCategoryRepository.deleteByColumnId(columnEntity);
             columnRepository.delete(columnEntity);
             return 1;
         }
@@ -97,7 +103,10 @@ public class ColumnService {
     }
 
     /* 칼럼 수정 */
-    public ColumnDetailResponseDto updateColumn(Long columnId, ColumnRequestDto columnRequestDto) {
+    public ColumnDetailResponseDto updateColumn(Long columnId, ColumnRequestDto columnRequestDto, Long loginUserId) {
+
+        User user = userRepository.findById(loginUserId)
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
         ColumnEntity columnEntity = columnRepository.findById(columnId).orElse(null);
         if (columnEntity == null){
             throw new EntityNotFoundException("Column Not Found");
@@ -112,7 +121,7 @@ public class ColumnService {
         List<Long> categories = getCategories(columnEntity, columnRequestDto);
 
         return new ColumnDetailResponseDto(
-                columnEntity.getColumnAutherId().getUserId(),
+                user.getUserId(),
                 columnEntity.getTitle(),
                 columnEntity.getContent(),
                 columnEntity.getLikeCount(),
@@ -130,13 +139,13 @@ public class ColumnService {
 
     /* 전체 칼럼 조회 */
     public List<ColumnReadResponseDto> getColumnHome() {
-        List<ColumnEntity> columnEntities = columnRepository.findAllOrderByCreateDateDesc();
+        List<ColumnEntity> columnEntities = columnRepository.findAllByOrderByCreatedAtDesc();
         List<ColumnReadResponseDto> columnReadResponseDtos = new ArrayList<>();
         for (ColumnEntity columnEntity : columnEntities) {
             ColumnReadResponseDto columnReadResponseDto = new ColumnReadResponseDto();
             columnReadResponseDto.setColumnId(columnEntity.getColumnId());
 
-            List<ColumnCategory> columnCategories = columnCategoryRepository.findByColumnId(columnEntity.getColumnId());
+            List<ColumnCategory> columnCategories = columnCategoryRepository.findByColumnId(columnEntity);
             List<Long> categories = new ArrayList<>();
             for (ColumnCategory columnCategory : columnCategories) {
                 Category category = columnCategory.getCategoryId();
@@ -165,7 +174,7 @@ public class ColumnService {
         if (columnEntity == null){
             throw new EntityNotFoundException("Column Not Found");
         }else {
-            List<ColumnCategory> columnCategories = columnCategoryRepository.findByColumnId(columnId);
+            List<ColumnCategory> columnCategories = columnCategoryRepository.findByColumnId(columnEntity);
             List<Long> categories = new ArrayList<>();
             for (ColumnCategory columnCategory : columnCategories) {
                 Category category = columnCategory.getCategoryId();

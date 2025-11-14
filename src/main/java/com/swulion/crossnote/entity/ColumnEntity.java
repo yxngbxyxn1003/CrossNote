@@ -19,7 +19,7 @@ public class ColumnEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long columnId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User columnAutherId;
 
