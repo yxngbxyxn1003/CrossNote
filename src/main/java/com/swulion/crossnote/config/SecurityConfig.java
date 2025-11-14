@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // 로그인/로그아웃 관련은 모두 허용
-                                .requestMatchers("/h2-console/**","/auth/logout", "/auth/local/**", "/auth/login/**", "/auth/refresh").permitAll()
+                                .requestMatchers("/auth/logout", "/auth/local/**", "/auth/login/**", "/auth/refresh").permitAll()
                                 .requestMatchers(allowUrls).permitAll()  // 허용 URL 설정
                                 // 그 외 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
