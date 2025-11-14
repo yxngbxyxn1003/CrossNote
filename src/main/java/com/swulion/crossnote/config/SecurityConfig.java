@@ -7,6 +7,7 @@ import com.swulion.crossnote.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity // Spring Security 설정 활성화
 @RequiredArgsConstructor
+@Profile("local")
 public class SecurityConfig {
 
     // JWT 인증 필터
@@ -69,13 +71,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // 로그인/로그아웃 관련은 모두 허용
-                                .requestMatchers("/auth/logout", "/auth/local/**", "/auth/login/**", "/auth/refresh").permitAll()
+                                .requestMatchers("/h2-console/**","/auth/logout", "/auth/local/**", "/auth/login/**", "/auth/refresh").permitAll()
                                 .requestMatchers(allowUrls).permitAll()  // 허용 URL 설정
                                 // 그 외 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
                 )
-
-
 
                 // JWT 필터
                 // Spring Security 필터 체인의 가장 앞단에 배치하여, 모든 요청을 토큰 검사부터 하도록 설정

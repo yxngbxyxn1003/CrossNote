@@ -2,11 +2,14 @@ package com.swulion.crossnote.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "column")
@@ -19,23 +22,6 @@ public class ColumnEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private User columnAutherId;
-
-    // 카테고리 최대 3개라서 하나는 not null, 두 개는 nullable하게 기본값 설정하도록 DB 수정했습니다.
-//    @ManyToOne
-//    @JoinColumn(name  = "categoryId")
-//    @Column(nullable = false)
-//    private Category categoryId1;
-
-//    @ManyToOne
-//    @JoinColumn(name  = "categoryId")
-//    @Column(nullable = true)
-//    private Category categoryId2;
-
-//    @ManyToOne
-//    @JoinColumn(name  = "categoryId")
-//    @Column(nullable = true)
-//    private Category categoryId3;
-
 
     @Column(length = 100)
     private String title;
