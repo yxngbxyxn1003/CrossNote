@@ -135,14 +135,25 @@ public class ColumnService {
         for (ColumnEntity columnEntity : columnEntities) {
             ColumnReadResponseDto columnReadResponseDto = new ColumnReadResponseDto();
             columnReadResponseDto.setColumnId(columnEntity.getColumnId());
+
+            List<ColumnCategory> columnCategories = columnCategoryRepository.findByColumnId(columnEntity.getColumnId());
+            List<Long> categories = new ArrayList<>();
+            for (ColumnCategory columnCategory : columnCategories) {
+                Category category = columnCategory.getCategoryId();
+                categories.add(category.getCategoryId());
+            }
+
+            Long cat2 = categories.size() > 1 ? categories.get(1) : null;
+            Long cat3 = categories.size() > 2 ? categories.get(2) : null;
+
             columnReadResponseDto.setAuthorId(columnEntity.getColumnAutherId().getUserId());
             columnReadResponseDto.setTitle(columnEntity.getTitle());
             columnReadResponseDto.setIsBestColumn(columnEntity.isBestColumn());
             columnReadResponseDto.setCommentCount(columnEntity.getCommentCount());
             columnReadResponseDto.setLikeCount(columnEntity.getLikeCount());
-            columnReadResponseDto.setCategoryId1(columnReadResponseDto.getCategoryId1());
-            columnReadResponseDto.setCategoryId2(columnReadResponseDto.getCategoryId2());
-            columnReadResponseDto.setCategoryId3(columnReadResponseDto.getCategoryId3());
+            columnReadResponseDto.setCategoryId1(categories.get(0));
+            columnReadResponseDto.setCategoryId2(cat2);
+            columnReadResponseDto.setCategoryId3(cat3);
             columnReadResponseDtos.add(columnReadResponseDto);
         }
         return columnReadResponseDtos;
@@ -160,6 +171,10 @@ public class ColumnService {
                 Category category = columnCategory.getCategoryId();
                 categories.add(category.getCategoryId());
             }
+
+            Long cat2 = categories.size() > 1 ? categories.get(1) : null;
+            Long cat3 = categories.size() > 2 ? categories.get(2) : null;
+
             return new ColumnDetailResponseDto(
                     columnEntity.getColumnAutherId().getUserId(),
                     columnEntity.getTitle(),
@@ -171,8 +186,8 @@ public class ColumnService {
                     columnEntity.getCreatedAt(),
                     columnEntity.getUpdatedAt(),
                     categories.get(0),
-                    categories.get(1),
-                    categories.get(2)
+                    cat2,
+                    cat3
             );
         }
 
