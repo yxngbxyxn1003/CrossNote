@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -19,13 +18,13 @@ public class OAuthAttributes {
     private String name;
     private String email;
     private String profileImageUrl;
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
     private LoginType loginType;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey,
                            String name, String email, String profileImageUrl,
-                           LocalDateTime birthDate, LoginType loginType) {
+                           LocalDate birthDate, LoginType loginType) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.name = name;
@@ -66,7 +65,7 @@ public class OAuthAttributes {
         // 생년월일 파싱 (AuthService 로직 참고)
         String birthyear = (String) kakaoAccount.get("birthyear"); // YYYY
         String birthday = (String) kakaoAccount.get("birthday"); // MMDD
-        LocalDateTime parsedBirthDate = parseBirthDate(birthyear, birthday);
+        LocalDate parsedBirthDate = parseBirthDate(birthyear, birthday);
 
         return OAuthAttributes.builder()
                 .name(name)
@@ -98,7 +97,7 @@ public class OAuthAttributes {
     }
 
     // 생년월일 파싱 헬퍼 메서드
-    private static LocalDateTime parseBirthDate(String birthyear, String birthday) {
+    private static LocalDate parseBirthDate(String birthyear, String birthday) {
         try {
             if (birthyear != null && birthyear.matches("\\d{4}") &&
                     birthday != null && birthday.matches("\\d{4}")) {
@@ -107,7 +106,7 @@ public class OAuthAttributes {
                 int day = Integer.parseInt(birthday.substring(2));
 
                 if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-                    return LocalDate.of(year, month, day).atStartOfDay();
+                    return LocalDate.of(year, month, day);
                 }
             }
         } catch (Exception e) {
@@ -124,7 +123,7 @@ public class OAuthAttributes {
                 .profileImageUrl(profileImageUrl)
                 .birthDate(birthDate) // 생년월일 추가
                 .loginType(loginType) // KAKAO 또는 GOOGLE
-                .curationLevel(1) // (기본값 1)
+                .curationLevel(null)
                 // 소셜 로그인은 password가 필요 없으므로 null
                 .build();
     }
