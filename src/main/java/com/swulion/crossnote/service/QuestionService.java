@@ -71,7 +71,7 @@ public class QuestionService {
         Long responseCatId3 = (category3 != null) ? category3.getCategoryId() : null;
 
         return new QuestionResponseDto(questionerId.getUserId(), question.getTitle(), question.getContent(),
-                0, question.getCreatedAt(), question.getUpdatedAt(), category1.getCategoryId(), responseCatId2, responseCatId3);
+                question.getLikeCount(), question.getCreatedAt(), question.getUpdatedAt(), category1.getCategoryId(), responseCatId2, responseCatId3);
 
     }
 

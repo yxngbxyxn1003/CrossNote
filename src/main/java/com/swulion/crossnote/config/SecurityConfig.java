@@ -75,8 +75,6 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
 
-
-
                 // JWT 필터
                 // Spring Security 필터 체인의 가장 앞단에 배치하여, 모든 요청을 토큰 검사부터 하도록 설정
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

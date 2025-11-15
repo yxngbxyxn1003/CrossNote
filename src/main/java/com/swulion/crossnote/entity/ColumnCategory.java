@@ -9,22 +9,24 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "category")
-public class Category {
+@Table(name = "columnCategory")
+public class ColumnCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryId;
-
-    @Column(nullable = false, unique = true)
-    private String categoryName;
+    private Long columnCategoryId;
 
     @ManyToOne
-    @JoinColumn(name = "parent_category_id")
-    private Category parentCategory;
+    @JoinColumn(name = "columnId")
+    private ColumnEntity columnId;
+
+    @ManyToOne
+    @JoinColumn(name = "categoryId")
+    private Category categoryId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
