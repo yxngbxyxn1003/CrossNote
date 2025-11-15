@@ -23,8 +23,8 @@ public class Category {
     private String categoryName;
 
     @ManyToOne
-    @JoinColumn(name = "parent_category_id")
-    private Category parentCategory;
+    @JoinColumn(name = "parentCategoryId")
+    private Category parentCategoryId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
